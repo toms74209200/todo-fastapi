@@ -1,0 +1,12 @@
+{
+    "[python]": {
+        "editor.formatOnSave": true,
+        "editor.tabSize": 2,
+        "editor.defaultFormatter": "charliermarsh.ruff"
+    },
+    "python.testing.pytestArgs": [
+        "server"
+    ],
+    "python.testing.unittestEnabled": false,
+    "python.testing.pytestEnabled": true
+}
