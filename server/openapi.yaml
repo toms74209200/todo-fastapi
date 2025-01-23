@@ -1,0 +1,377 @@
+openapi: 3.0.3
+info:
+  contact:
+    name: toms74209200
+    url: https://github.com/toms74209200/openapi-todo-example
+  description: TODO application Web API example using by OpenAPI Specification
+  license:
+    name: MIT
+    url: https://raw.githubusercontent.com/toms74209200/openapi-todo-example/3bd8959fcf6b0e2601bbe11f3a2803898ea84d24/LICENSE
+  title: openapi-todo-example
+  version: 1.0.0
+servers:
+- description: develop
+  url: http://localhost:8080
+tags:
+- name: users
+- name: auth
+- name: tasks
+paths:
+  /users:
+    post:
+      description: ユーザーを登録する。
+      operationId: postUsers
+      requestBody:
+        $ref: '#/components/requestBodies/postUsersRequest'
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/postUsers_201_response'
+          description: 新しいユーザーが作成されました
+        "400":
+          description: Bad Request
+      summary: ユーザー登録API
+      tags:
+      - users
+  /auth:
+    post:
+      description: ユーザー認証しトークンを取得する。
+      operationId: postAuth
+      requestBody:
+        $ref: '#/components/requestBodies/postAuthRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Token'
+          description: 認証されたユーザーのトークンが返されます
+        "400":
+          description: Bad Request
+      summary: ユーザー認証API
+      tags:
+      - auth
+  /tasks:
+    get:
+      description: 指定したユーザーのタスク一覧を取得する。
+      operationId: getTasks
+      parameters:
+      - description: 取得するタスクのユーザーID
+        explode: true
+        in: query
+        name: userId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: form
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                items:
+                  $ref: '#/components/schemas/Task'
+                type: array
+          description: 指定されたユーザーのタスク一覧が返されます
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+      security:
+      - BearerAuth: []
+      summary: ユーザーのタスク一覧取得API
+      tags:
+      - tasks
+    post:
+      description: タスクを登録する。
+      operationId: postTasks
+      requestBody:
+        $ref: '#/components/requestBodies/postTasksRequest'
+      responses:
+        "201":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TaskId'
+          description: 新しいタスクが作成されました
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+      security:
+      - BearerAuth: []
+      summary: タスク登録API
+      tags:
+      - tasks
+  /tasks/{taskId}:
+    delete:
+      description: 指定したタスクを削除する。
+      operationId: deleteTasks
+      parameters:
+      - explode: false
+        in: path
+        name: taskId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      responses:
+        "204":
+          description: Delete Succeeded
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+      security:
+      - BearerAuth: []
+      summary: タスク削除API
+      tags:
+      - tasks
+    put:
+      description: 指定したタスクを更新する。
+      operationId: putTasks
+      parameters:
+      - description: 更新するタスクのID
+        explode: false
+        in: path
+        name: taskId
+        required: true
+        schema:
+          format: int64
+          type: integer
+        style: simple
+      requestBody:
+        $ref: '#/components/requestBodies/putTasksRequest'
+      responses:
+        "200":
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Task'
+          description: 更新されたタスクが返されます
+        "400":
+          description: Bad Request
+        "401":
+          description: Unauthorized
+        "404":
+          description: Not Found
+      security:
+      - BearerAuth: []
+      summary: タスク更新API
+      tags:
+      - tasks
+components:
+  requestBodies:
+    postUsersRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserCredentials'
+    postAuthRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/UserCredentials'
+    postTasksRequest:
+      content:
+        application/json:
+          examples:
+            Example 1:
+              value:
+                name: string
+                description: string
+                deadline: 2019-08-24T14:15:22Z
+                completed: false
+          schema:
+            $ref: '#/components/schemas/postTasks_request'
+    putTasksRequest:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/putTasks_request'
+  responses:
+    postUsersResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/postUsers_201_response'
+      description: 新しいユーザーが作成されました
+    postAuthResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Token'
+      description: 認証されたユーザーのトークンが返されます
+    postTasksResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/TaskId'
+      description: 新しいタスクが作成されました
+    getTasksResponse:
+      content:
+        application/json:
+          schema:
+            items:
+              $ref: '#/components/schemas/Task'
+            type: array
+      description: 指定されたユーザーのタスク一覧が返されます
+    putTasksResponse:
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Task'
+      description: 更新されたタスクが返されます
+  schemas:
+    UserCredentials:
+      example:
+        password: password
+        email: email
+      properties:
+        email:
+          description: ユーザーのメールアドレス
+          format: email
+          title: email
+          type: string
+        password:
+          description: ユーザーのパスワード
+          title: password
+          type: string
+      required:
+      - email
+      - password
+      title: UserCredentials
+      type: object
+      x-examples:
+        Example 1:
+          email: user@example.com
+          password: password0123!?
+    Token:
+      example:
+        token: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+      properties:
+        token:
+          description: JWTトークン
+          example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c
+          title: token
+          type: string
+      title: Token
+      type: object
+    Task:
+      example:
+        name: name
+        description: description
+        id: 0
+        completed: false
+        deadline: 2000-01-23T04:56:07.000+00:00
+      properties:
+        id:
+          description: タスクの一意な識別子
+          format: int64
+          title: id
+          type: integer
+        name:
+          description: タスクの名前
+          title: name
+          type: string
+        description:
+          description: タスクの説明
+          title: description
+          type: string
+        deadline:
+          description: タスクの期限。ISO 8601形式の日時文字列。
+          format: date-time
+          title: deadline
+          type: string
+        completed:
+          default: false
+          description: タスクが完了したかどうかを示す
+          title: completed
+          type: boolean
+      title: Task
+      type: object
+    TaskId:
+      example:
+        id: 0
+      properties:
+        id:
+          description: タスクの一意な識別子
+          format: int64
+          title: id
+          type: integer
+      title: TaskId
+      type: object
+    postUsers_201_response:
+      example:
+        id: 0
+      properties:
+        id:
+          description: ユーザーの一意な識別子
+          format: int64
+          title: id
+          type: integer
+      title: postUsers_201_response
+      type: object
+    postTasks_request:
+      properties:
+        name:
+          description: タスクの名前
+          title: name
+          type: string
+        description:
+          description: タスクの説明
+          title: description
+          type: string
+        deadline:
+          description: タスクの期限。ISO 8601形式の日時文字列。
+          format: date-time
+          title: deadline
+          type: string
+        completed:
+          default: false
+          description: タスクが完了したかどうかを示す
+          title: completed
+          type: boolean
+      required:
+      - deadline
+      - description
+      - name
+      title: postTasks_request
+      type: object
+    putTasks_request:
+      properties:
+        name:
+          description: タスクの名前
+          title: name
+          type: string
+        description:
+          description: タスクの説明
+          title: description
+          type: string
+        deadline:
+          description: タスクの期限。ISO 8601形式の日時文字列。
+          format: date-time
+          title: deadline
+          type: string
+        completed:
+          default: false
+          description: タスクが完了したかどうかを示す
+          title: completed
+          type: boolean
+      title: putTasks_request
+      type: object
+  securitySchemes:
+    BearerAuth:
+      bearerFormat: JWT
+      scheme: bearer
+      type: http
+x-stoplight:
+  id: 9ymw12wrbmtwm
