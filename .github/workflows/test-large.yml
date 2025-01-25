@@ -24,13 +24,15 @@ jobs:
           openapi-generator-cli generate -i https://raw.githubusercontent.com/toms74209200/openapi-todo-example/refs/heads/master/reference/spec.yaml -g python -o ./e2etest/openapi_gen
           cd e2etest/openapi_gen
           pip install -r requirements.txt
+          pip install setuptools
           python setup.py install --user
       - name: Install dependencies
         run: |
+          pip install -r requirements.txt
           pip install -r server/requirements.txt
           pip install -r e2etest/requirements.txt
       - name: Launch server
-        run: PYTHONPATH=src uvicorn openapi_server.main:app --host 0.0.0.0 --port 8080
+        run: PYTHONPATH=src uvicorn openapi_server.main:app --host 0.0.0.0 --port 8080 &
         working-directory: server
       - name: Run tests
         run: pytest tests/ -v
