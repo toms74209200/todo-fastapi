@@ -13,9 +13,18 @@ class IUserRepository(ABC):
 
 
 class InMemoryUserRepository(IUserRepository):
+    _instance = None
+    _users: Dict[int, Dict] = {}
+    _next_id = 1
+
+    def __new__(cls):
+        if cls._instance is None:
+            cls._instance = super(InMemoryUserRepository, cls).__new__(cls)
+        return cls._instance
+
     def __init__(self):
-        self._users: Dict[int, Dict] = {}
-        self._next_id = 1
+        # シングルトンなので初期化は__new__で行う
+        pass
 
     async def create(self, email: str, password_hash: str) -> int:
         user_id = self._next_id
