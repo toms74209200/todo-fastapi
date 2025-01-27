@@ -14,6 +14,16 @@ ACCESS_TOKEN_EXPIRE_MINUTES = int(
 )
 
 
+def verify_token(token: str) -> dict:
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        return payload
+    except jwt.ExpiredSignatureError:
+        raise Exception("トークンの有効期限が切れています")
+    except jwt.InvalidTokenError:
+        raise Exception("無効なトークンです")
+
+
 class AuthService:
     def __init__(self, repository: InMemoryUserRepository):
         self._repository = repository
