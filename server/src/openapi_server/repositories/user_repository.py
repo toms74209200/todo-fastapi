@@ -11,6 +11,10 @@ class IUserRepository(ABC):
     async def find_by_email(self, email: str) -> Optional[Dict]:
         pass
 
+    @abstractmethod
+    async def find_by_id(self, user_id: int) -> Optional[Dict]:
+        pass
+
 
 class InMemoryUserRepository(IUserRepository):
     _instance = None
@@ -41,3 +45,7 @@ class InMemoryUserRepository(IUserRepository):
             if user["email"] == email:
                 return user.copy()
         return None
+
+    async def find_by_id(self, user_id: int) -> Optional[Dict]:
+        user = self._users.get(user_id)
+        return user.copy() if user else None

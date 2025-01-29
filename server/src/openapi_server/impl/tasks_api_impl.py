@@ -67,11 +67,29 @@ class TasksApiImpl(BaseTasksApi):
             )
 
         try:
+            # トークンからユーザーIDを取得
+            user_id = token_BearerAuth.get("sub")
+            if user_id is None:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="ユーザーIDが見つかりません",
+                )
+
+            # 文字列のユーザーIDを整数に変換
+            try:
+                user_id = int(user_id)
+            except (ValueError, TypeError):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="無効なユーザーIDです",
+                )
+
             task_id = await self._service.create_task(
                 name=post_tasks_request.name,
                 description=post_tasks_request.description,
                 deadline=post_tasks_request.deadline,
                 completed=post_tasks_request.completed or False,
+                user_id=user_id,
             )
             return Response(
                 status_code=status.HTTP_201_CREATED,
