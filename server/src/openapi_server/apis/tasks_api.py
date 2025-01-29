@@ -53,9 +53,7 @@ for _, name, _ in pkgutil.iter_modules(ns_pkg.__path__, ns_pkg.__name__ + "."):
 )
 async def delete_tasks(
     taskId: StrictInt = Path(..., description=""),
-    token_BearerAuth: TokenModel = Security(
-        get_token_BearerAuth
-    ),
+    token_BearerAuth: TokenModel = Security(get_token_BearerAuth),
 ) -> None:
     """指定したタスクを削除する。"""
     if not BaseTasksApi.subclasses:
@@ -66,7 +64,10 @@ async def delete_tasks(
 @router.get(
     "/tasks",
     responses={
-        200: {"model": List[Task], "description": "指定されたユーザーのタスク一覧が返されます"},
+        200: {
+            "model": List[Task],
+            "description": "指定されたユーザーのタスク一覧が返されます",
+        },
         400: {"description": "Bad Request"},
         401: {"description": "Unauthorized"},
         404: {"description": "Not Found"},
@@ -76,10 +77,10 @@ async def delete_tasks(
     response_model_by_alias=True,
 )
 async def get_tasks(
-    user_id: Annotated[StrictInt, Field(description="取得するタスクのユーザーID")] = Query(None, description="取得するタスクのユーザーID", alias="userId"),
-    token_BearerAuth: TokenModel = Security(
-        get_token_BearerAuth
-    ),
+    user_id: Annotated[
+        StrictInt, Field(description="取得するタスクのユーザーID")
+    ] = Query(None, description="取得するタスクのユーザーID", alias="userId"),
+    token_BearerAuth: TokenModel = Security(get_token_BearerAuth),
 ) -> List[Task]:
     """指定したユーザーのタスク一覧を取得する。"""
     if not BaseTasksApi.subclasses:
@@ -100,14 +101,14 @@ async def get_tasks(
 )
 async def post_tasks(
     post_tasks_request: Optional[PostTasksRequest] = Body(None, description=""),
-    token_BearerAuth: TokenModel = Security(
-        get_token_BearerAuth
-    ),
+    token_BearerAuth: TokenModel = Security(get_token_BearerAuth),
 ) -> TaskId:
     """タスクを登録する。"""
     if not BaseTasksApi.subclasses:
         raise HTTPException(status_code=500, detail="Not implemented")
-    return await BaseTasksApi.subclasses[0]().post_tasks(post_tasks_request)
+    return await BaseTasksApi.subclasses[0]().post_tasks(
+        post_tasks_request, token_BearerAuth
+    )
 
 
 @router.put(
@@ -123,11 +124,11 @@ async def post_tasks(
     response_model_by_alias=True,
 )
 async def put_tasks(
-    taskId: Annotated[StrictInt, Field(description="更新するタスクのID")] = Path(..., description="更新するタスクのID"),
-    put_tasks_request: Optional[PutTasksRequest] = Body(None, description=""),
-    token_BearerAuth: TokenModel = Security(
-        get_token_BearerAuth
+    taskId: Annotated[StrictInt, Field(description="更新するタスクのID")] = Path(
+        ..., description="更新するタスクのID"
     ),
+    put_tasks_request: Optional[PutTasksRequest] = Body(None, description=""),
+    token_BearerAuth: TokenModel = Security(get_token_BearerAuth),
 ) -> Task:
     """指定したタスクを更新する。"""
     if not BaseTasksApi.subclasses:
