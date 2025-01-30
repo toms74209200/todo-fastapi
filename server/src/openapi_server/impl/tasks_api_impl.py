@@ -98,3 +98,48 @@ class TasksApiImpl(BaseTasksApi):
             )
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    async def get_tasks(
+        self,
+        user_id: Optional[int] = None,
+        token_BearerAuth: TokenModel = Security(get_token_BearerAuth),
+    ) -> List[Task]:
+        """
+        タスク取得の実装
+        """
+        try:
+            # トークンからユーザーIDを取得して検証
+            token_user_id = token_BearerAuth.get("sub")
+            if token_user_id is None:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="ユーザーIDが見つかりません",
+                )
+
+            try:
+                token_user_id = int(token_user_id)
+            except (ValueError, TypeError):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="無効なユーザーIDです",
+                )
+
+            if user_id is None:
+                raise HTTPException(
+                    status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
+                    detail="ユーザーIDは必須です",
+                )
+
+            # ユーザーIDに紐づくタスクを取得
+            tasks = await self._repository.find_by_user_id(user_id)
+
+            if not tasks and user_id != token_user_id:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="指定されたユーザーが見つかりません",
+                )
+
+            return tasks
+
+        except ValueError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
