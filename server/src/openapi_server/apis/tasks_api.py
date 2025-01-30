@@ -85,7 +85,7 @@ async def get_tasks(
     """指定したユーザーのタスク一覧を取得する。"""
     if not BaseTasksApi.subclasses:
         raise HTTPException(status_code=500, detail="Not implemented")
-    return await BaseTasksApi.subclasses[0]().get_tasks(user_id)
+    return await BaseTasksApi.subclasses[0]().get_tasks(user_id, token_BearerAuth)
 
 
 @router.post(
