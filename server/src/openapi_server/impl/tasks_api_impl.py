@@ -143,3 +143,76 @@ class TasksApiImpl(BaseTasksApi):
 
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    async def put_tasks(
+        self,
+        taskId: int,
+        put_tasks_request: Optional[PutTasksRequest] = None,
+        token_BearerAuth: TokenModel = Security(get_token_BearerAuth),
+    ) -> Task:
+        """
+        タスク更新の実装
+        """
+        if put_tasks_request is None:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="タスク情報が必要です",
+            )
+
+        if not isinstance(put_tasks_request.name, str):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="タスク名は文字列である必要があります",
+            )
+
+        if not isinstance(put_tasks_request.description, str):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="説明は文字列である必要があります",
+            )
+
+        if not isinstance(put_tasks_request.deadline, datetime):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="期限は日時形式である必要があります",
+            )
+
+        try:
+            # トークンからユーザーIDを取得
+            user_id = token_BearerAuth.get("sub")
+            if user_id is None:
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="ユーザーIDが見つかりません",
+                )
+
+            # 文字列のユーザーIDを整数に変換
+            try:
+                user_id = int(user_id)
+            except (ValueError, TypeError):
+                raise HTTPException(
+                    status_code=status.HTTP_400_BAD_REQUEST,
+                    detail="無効なユーザーIDです",
+                )
+
+            # 既存のタスクを取得
+            existing_task = await self._repository.find_by_id(taskId, user_id)
+            if existing_task is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="指定されたタスクが見つかりません",
+                )
+
+            # タスクを更新
+            updated_task = Task(
+                id=taskId,
+                name=put_tasks_request.name,
+                description=put_tasks_request.description,
+                deadline=put_tasks_request.deadline,
+                completed=put_tasks_request.completed,
+            )
+
+            return await self._repository.update(updated_task, user_id)
+
+        except ValueError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
