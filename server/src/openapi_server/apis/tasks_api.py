@@ -133,4 +133,6 @@ async def put_tasks(
     """指定したタスクを更新する。"""
     if not BaseTasksApi.subclasses:
         raise HTTPException(status_code=500, detail="Not implemented")
-    return await BaseTasksApi.subclasses[0]().put_tasks(taskId, put_tasks_request)
+    return await BaseTasksApi.subclasses[0]().put_tasks(
+        taskId, put_tasks_request, token_BearerAuth
+    )
