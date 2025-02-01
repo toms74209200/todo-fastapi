@@ -4,10 +4,6 @@ WORKDIR=/workspaces/todo-fastapi
 
 cd $WORKDIR
 
-pip install --user -r requirements.txt
+sudo pip install -r requirements.txt
 
-npm install -g @openapitools/openapi-generator-cli
-
-make openapi
-
-pip install --user -r /workspaces/todo-fastapi/server/requirements.txt
+sudo pip install -r /workspaces/todo-fastapi/server/requirements.txt

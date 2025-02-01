@@ -1,0 +1,18 @@
+services:
+  server:
+    image: mcr.microsoft.com/devcontainers/python:1-3.12-bookworm
+    volumes:
+      - .:/workspaces/todo-fastapi
+    working_dir: /workspaces/todo-fastapi/server
+    command: /bin/bash -c "/workspaces/todo-fastapi/.devcontainer/install.sh && PYTHONPATH=src uvicorn openapi_server.main:app --host 0.0.0.0 --port 8080"
+    ports:
+      - 8080:8080
+
+  e2etest:
+    image: mcr.microsoft.com/devcontainers/python:1-3.12-bookworm
+    volumes:
+      - .:/workspaces/todo-fastapi
+    working_dir: /workspaces/todo-fastapi/e2etest
+    command: /bin/bash -c "./install.sh && /workspaces/todo-fastapi/wait-for-it.sh server:8080 && pytest tests/ -v"
+    environment:
+      - DOMAIN=server:8080
