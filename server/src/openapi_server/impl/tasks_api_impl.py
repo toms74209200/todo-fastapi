@@ -216,3 +216,44 @@ class TasksApiImpl(BaseTasksApi):
 
         except ValueError as e:
             raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))
+
+    async def delete_tasks(
+        self,
+        taskId: int,
+        token_BearerAuth: TokenModel = Security(get_token_BearerAuth),
+    ) -> None:
+        """
+        タスク削除の実装
+        """
+        try:
+            # トークンからユーザーIDを取得
+            user_id = token_BearerAuth.get("sub")
+            if user_id is None:
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="ユーザーIDが見つかりません",
+                )
+
+            # 文字列のユーザーIDを整数に変換
+            try:
+                user_id = int(user_id)
+            except (ValueError, TypeError):
+                raise HTTPException(
+                    status_code=status.HTTP_401_UNAUTHORIZED,
+                    detail="無効なユーザーIDです",
+                )
+
+            # 既存のタスクを取得して存在確認
+            existing_task = await self._repository.find_by_id(taskId, user_id)
+            if existing_task is None:
+                raise HTTPException(
+                    status_code=status.HTTP_404_NOT_FOUND,
+                    detail="指定されたタスクが見つかりません",
+                )
+
+            # タスクを削除
+            await self._repository.delete(taskId, user_id)
+            return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+        except ValueError as e:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail=str(e))

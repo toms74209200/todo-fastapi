@@ -58,7 +58,7 @@ async def delete_tasks(
     """指定したタスクを削除する。"""
     if not BaseTasksApi.subclasses:
         raise HTTPException(status_code=500, detail="Not implemented")
-    return await BaseTasksApi.subclasses[0]().delete_tasks(taskId)
+    return await BaseTasksApi.subclasses[0]().delete_tasks(taskId, token_BearerAuth)
 
 
 @router.get(
