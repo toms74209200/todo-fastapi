@@ -16,3 +16,15 @@ services:
     command: /bin/bash -c "./install.sh && /workspaces/todo-fastapi/wait-for-it.sh server:8080 && pytest tests/ -v"
     environment:
       - DOMAIN=server:8080
+
+  manualtest:
+    image: mcr.microsoft.com/devcontainers/python:1-3.12-bookworm
+    volumes:
+      - .:/workspaces/todo-fastapi
+    working_dir: /workspaces/todo-fastapi/manualtest
+    command: /bin/bash -c "./install.sh && /home/vscode/.local/bin/jupyter lab --ip 0.0.0.0"
+    ports:
+      - 8888:8888
+    environment:
+      - DOMAIN=server:8080
+    user: vscode
