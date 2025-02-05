@@ -2,3 +2,5 @@ openapitools.json
 openapi_gen/
 
 __pycache__/
+
+.ipynb_checkpoints/
