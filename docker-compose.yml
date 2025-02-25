@@ -22,7 +22,7 @@ services:
     volumes:
       - .:/workspaces/todo-fastapi
     working_dir: /workspaces/todo-fastapi/manualtest
-    command: /bin/bash -c "./install.sh && /home/vscode/.local/bin/jupyter lab --ip 0.0.0.0"
+    command: /bin/bash -c "./install.sh && /home/vscode/.local/bin/jupyter lab --ip 0.0.0.0 --NotebookApp.password=''"
     ports:
       - 8888:8888
     environment:
