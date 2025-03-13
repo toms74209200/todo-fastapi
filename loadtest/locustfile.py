@@ -34,7 +34,7 @@ class AuthenticateAPI(HttpUser):
         # Create a user using OpenAPI client
         email = f"{random_string(10)}@example.com"
         self.password = random_string(10)
-        api_client = ApiClient(Configuration(host=f"http://{self.host}"))
+        api_client = ApiClient(Configuration(host=self.host))
         UsersApi(api_client).post_users(
             user_credentials={"email": email, "password": self.password}
         )
@@ -61,7 +61,7 @@ class CreateTaskAPI(HttpUser):
         # Create user and get token using OpenAPI client
         email = f"{random_string(10)}@example.com"
         password = random_string(10)
-        api_client = ApiClient(Configuration(host=f"http://{self.host}"))
+        api_client = ApiClient(Configuration(host=self.host))
         UsersApi(api_client).post_users(
             user_credentials={"email": email, "password": password}
         )
@@ -95,7 +95,7 @@ class GetTasksAPI(HttpUser):
         # Create user and get token using OpenAPI client
         email = f"{random_string(10)}@example.com"
         password = random_string(10)
-        api_client = ApiClient(Configuration(host=f"http://{self.host}"))
+        api_client = ApiClient(Configuration(host=self.host))
         self.user_response = UsersApi(api_client).post_users(
             user_credentials={"email": email, "password": password}
         )
@@ -122,7 +122,7 @@ class UpdateTaskAPI(HttpUser):
         # Create user and get token using OpenAPI client
         email = f"{random_string(10)}@example.com"
         password = random_string(10)
-        api_client = ApiClient(Configuration(host=f"http://{self.host}"))
+        api_client = ApiClient(Configuration(host=self.host))
         UsersApi(api_client).post_users(
             user_credentials={"email": email, "password": password}
         )
@@ -171,7 +171,7 @@ class DeleteTaskAPI(HttpUser):
         # Create user and get token using OpenAPI client
         email = f"{random_string(10)}@example.com"
         password = random_string(10)
-        api_client = ApiClient(Configuration(host=f"http://{self.host}"))
+        api_client = ApiClient(Configuration(host=self.host))
         UsersApi(api_client).post_users(
             user_credentials={"email": email, "password": password}
         )
@@ -183,7 +183,7 @@ class DeleteTaskAPI(HttpUser):
 
     def create_task(self):
         # Create a new task using OpenAPI client
-        api_client = ApiClient(Configuration(host=f"http://{self.host}"))
+        api_client = ApiClient(Configuration(host=self.host))
         api_client.set_default_header("Authorization", f"Bearer {self.token}")
         tasks_api = TasksApi(api_client)
         deadline = datetime.datetime.now() + datetime.timedelta(days=1)
