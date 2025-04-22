@@ -104,11 +104,22 @@ class GetTasksAPI(HttpUser):
         )
         self.token = auth_response.token
         self.headers = {"Authorization": f"Bearer {self.token}"}
+        api_client.set_default_header("Authorization", f"Bearer {self.token}")
+        tasks_api = TasksApi(api_client)
+        deadline = datetime.datetime.now() + datetime.timedelta(days=1)
+        tasks_api.post_tasks(
+            post_tasks_request={
+                "name": f"task_{random_string(5)}",
+                "description": f"description_{random_string(10)}",
+                "deadline": deadline.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "completed": False,
+            }
+        )
 
     @task
     def get_tasks(self):
         self.client.get(
-            "/tasks",
+            f"/tasks?userId={self.user_response.id}",
             headers=self.headers,
         )
 
